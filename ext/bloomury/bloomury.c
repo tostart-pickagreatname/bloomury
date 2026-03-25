@@ -83,11 +83,11 @@ void bloom_filter_init(BloomFilter *f, uint64_t bit_count,
   f->bit_count = bit_count;
   f->hash_count = hash_count;
   f->item_count = 0;
-  f->bits = calloc((bit_count + 7) / 8, 1);
+  f->bits = ruby_xcalloc((bit_count + 7) / 8, 1);
 }
 
 void bloom_filter_free(BloomFilter *f) {
-  free(f->bits);
+  ruby_xfree(f->bits);
   f->bits = NULL;
 }
 
@@ -121,7 +121,7 @@ int bloom_filter_check(BloomFilter *f, const uint8_t *data, size_t len) {
 static void bloom_free(void *ptr) {
   BloomFilter *f = (BloomFilter *)ptr;
   bloom_filter_free(f);
-  free(f);
+  ruby_xfree(f);
 }
 
 static size_t bloom_memsize(const void *ptr) {
@@ -136,7 +136,7 @@ static const rb_data_type_t bloom_type = {"BloomFilter",
                                           RUBY_TYPED_FREE_IMMEDIATELY};
 
 static VALUE bloom_alloc(VALUE klass) {
-  BloomFilter *f = calloc(1, sizeof(BloomFilter));
+  BloomFilter *f = ruby_xcalloc(1, sizeof(BloomFilter));
   return TypedData_Wrap_Struct(klass, &bloom_type, f);
 }
 
@@ -147,8 +147,18 @@ static VALUE bloom_initialize(VALUE self, VALUE capacity, VALUE error_rate) {
   double n = NUM2DBL(capacity);
   double p = NUM2DBL(error_rate);
 
+  if (n <= 0)
+    rb_raise(rb_eArgError, "capacity must be positive");
+  if (p <= 0 || p >= 1)
+    rb_raise(rb_eArgError, "error_rate must be between 0 and 1 (exclusive)");
+
   double m = ceil(-n * log(p) / (log(2) * log(2)));
   double k = round((m / n) * log(2));
+
+  if (!isfinite(m) || m > (double)SIZE_MAX)
+    rb_raise(rb_eRangeError,
+             "filter parameters would require an infeasible allocation; "
+             "run `rake memory_estimate[capacity,error_rate]` to check requirements first");
 
   bloom_filter_init(f, (uint64_t)m, (uint32_t)k);
   return self;
