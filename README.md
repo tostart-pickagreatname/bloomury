@@ -1,5 +1,7 @@
 # Bloomury
 
+![Bloomury poster](assets/bloomury_poster.svg)
+
 A probabilistic set membership filter backed by a native C extension. Uses double-hashing with MurmurHash3 (32-bit) and two fixed seeds to generate k independent hash positions per item, striking a balance between speed and low false-positive rates.
 
 The filter is parameterised by capacity and error rate; optimal bit count (m) and hash count (k) are derived at initialisation using the standard formulae. The bit array is heap-allocated and wrapped via Ruby's TypedData API for safe memory management.
