@@ -40,7 +40,7 @@ For network-exposed filters, initialize with random seeds and store them alongsi
 
 ### Not a cryptographic primitive
 
-MurmurHash3 is a non-cryptographic hash function optimized for speed and distribution quality. It is not suitable for password hashing, message authentication, or any use case requiring preimage resistance. For cryptographic pseudonymization see [dp_pseudonym](https://github.com/yourusername/dp_pseudonym).
+MurmurHash3 is a non-cryptographic hash function optimized for speed and distribution quality. It is not suitable for password hashing, message authentication, or any use case requiring preimage resistance. 
 
 ## Development
 
@@ -54,7 +54,7 @@ rake test     # run tests only
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/bloomury. Contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/bloomury/blob/master/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at https://github.com/stscott/bloomury. Contributors are expected to adhere to the [code of conduct](https://github.com/stscott/bloomury/blob/master/CODE_OF_CONDUCT.md).
 
 ## License
 
