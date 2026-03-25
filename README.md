@@ -126,7 +126,6 @@ Bloomury differs in a few deliberate ways:
 - **Non-counting filter** — no deletion support, which preserves the
   no-false-negatives guarantee that counting filters can violate on bucket
   overflow
-- **3-5x faster** in benchmarks for add and lookup operations
 
 If you need deletion support or a Redis-backed shared filter,
 `bloomfilter-rb` may be a better fit.
