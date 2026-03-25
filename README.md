@@ -60,6 +60,12 @@ filter.bit_count          # size of the underlying bit array
 filter.hash_count         # number of hash functions in use
 ```
 
+## Why MurmurHash3
+
+A Bloom filter needs to hash each item multiple times, quickly, with results spread evenly across the bit array. MurmurHash3 is a good fit: it's fast, has excellent distribution, and is simple enough to embed directly in the extension with no external dependency.
+
+It's not a cryptographic hash — it wasn't designed to be hard to reverse or to resist deliberate collisions. That's an acceptable trade-off here because speed and distribution quality matter more than security for this use case. If you need cryptographic guarantees, see the security section below.
+
 ## When to use a Bloom filter
 
 Good fits:
