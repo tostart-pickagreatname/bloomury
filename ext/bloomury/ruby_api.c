@@ -27,7 +27,17 @@ static VALUE bloom_alloc(VALUE klass) {
   return TypedData_Wrap_Struct(klass, &bloom_type, f);
 }
 
-static VALUE bloom_initialize(VALUE self, VALUE capacity, VALUE error_rate) {
+static VALUE bloom_initialize(int argc, VALUE *argv, VALUE self) {
+  VALUE capacity, error_rate, kwargs;
+  rb_scan_args(argc, argv, "2:", &capacity, &error_rate, &kwargs);
+
+  ID kwarg_ids[2] = { rb_intern("seed1"), rb_intern("seed2") };
+  VALUE kwarg_vals[2];
+  rb_get_kwargs(kwargs, kwarg_ids, 0, 2, kwarg_vals);
+
+  uint32_t seed1 = kwarg_vals[0] == Qundef ? 0x9747b28c : (uint32_t)NUM2ULONG(kwarg_vals[0]);
+  uint32_t seed2 = kwarg_vals[1] == Qundef ? 0x5a4afe17 : (uint32_t)NUM2ULONG(kwarg_vals[1]);
+
   BloomFilter *f;
   TypedData_Get_Struct(self, BloomFilter, &bloom_type, f);
 
@@ -50,8 +60,20 @@ static VALUE bloom_initialize(VALUE self, VALUE capacity, VALUE error_rate) {
   if (k < 1)
     rb_raise(rb_eArgError, "computed hash count is zero; error_rate is too loose");
 
-  bloom_filter_init(f, (uint64_t)m, (uint32_t)k);
+  bloom_filter_init(f, (uint64_t)m, (uint32_t)k, seed1, seed2);
   return self;
+}
+
+static VALUE bloom_seed1(VALUE self) {
+  BloomFilter *f;
+  TypedData_Get_Struct(self, BloomFilter, &bloom_type, f);
+  return UINT2NUM(f->seed1);
+}
+
+static VALUE bloom_seed2(VALUE self) {
+  BloomFilter *f;
+  TypedData_Get_Struct(self, BloomFilter, &bloom_type, f);
+  return UINT2NUM(f->seed2);
 }
 
 static VALUE bloom_add(VALUE self, VALUE item) {
@@ -96,7 +118,9 @@ RUBY_FUNC_EXPORTED void Init_bloomury(void) {
   rb_cBloomFilter = rb_define_class_under(rb_mBloomury, "Filter", rb_cObject);
 
   rb_define_alloc_func(rb_cBloomFilter, bloom_alloc);
-  rb_define_method(rb_cBloomFilter, "initialize", bloom_initialize, 2);
+  rb_define_method(rb_cBloomFilter, "initialize", bloom_initialize, -1);
+  rb_define_method(rb_cBloomFilter, "seed1", bloom_seed1, 0);
+  rb_define_method(rb_cBloomFilter, "seed2", bloom_seed2, 0);
   rb_define_method(rb_cBloomFilter, "add", bloom_add, 1);
   rb_define_method(rb_cBloomFilter, "include?", bloom_check, 1);
   rb_define_method(rb_cBloomFilter, "add_count", bloom_add_count, 0);

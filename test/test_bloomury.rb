@@ -68,4 +68,25 @@ class TestBloomury < Minitest::Test
     f = Bloomury::Filter.new(1000, 0.01)
     assert_operator f.hash_count, :>, 0
   end
+
+  # --- seeds ---
+
+  test "default seeds are applied" do
+    f = Bloomury::Filter.new(1000, 0.01)
+    assert_equal 0x9747b28c, f.seed1
+    assert_equal 0x5a4afe17, f.seed2
+  end
+
+  test "custom seeds are stored" do
+    f = Bloomury::Filter.new(1000, 0.01, seed1: 0xdeadbeef, seed2: 0xcafebabe)
+    assert_equal 0xdeadbeef, f.seed1
+    assert_equal 0xcafebabe, f.seed2
+  end
+
+  test "filter with custom seeds is self-consistent" do
+    f = Bloomury::Filter.new(1000, 0.01, seed1: 1, seed2: 2)
+    f.add("test")
+    assert f.include?("test")
+    refute f.include?("not_added")
+  end
 end
