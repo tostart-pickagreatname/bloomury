@@ -32,16 +32,7 @@ That's it. Pick a capacity roughly equal to the number of items you expect to ad
 
 **Capacity** is the number of items you plan to add. Going significantly over capacity increases the false positive rate beyond what you asked for.
 
-**Seeds** control which bit positions each item maps to inside the filter. The defaults are fine for local, in-process use. If you're exposing a filter over a network where untrusted parties can observe query results, supply random seeds so an adversary can't predict the bit layout:
-
-```ruby
-require "securerandom"
-
-filter = Bloomury::Filter.new(10_000, 0.01,
-  seed1: SecureRandom.random_number(0xFFFFFFFF),
-  seed2: SecureRandom.random_number(0xFFFFFFFF)
-)
-```
+**Seeds** control which bit positions each item maps to. The defaults are fine for most uses; see [Fixed hash seeds](#fixed-hash-seeds) if you're exposing a filter over a network.
 
 **Error rate** is the probability of a false positive once the filter is full. `0.01` means roughly 1 in 100 membership checks on unseen items will incorrectly return `true`. Lower is more accurate but uses more memory.
 
@@ -95,7 +86,16 @@ Not a good fit:
 
 This implementation uses fixed seeds for MurmurHash3 (`0x9747b28c` and `0x5a4afe17`). This is fine for local, in-process use — deduplication pipelines, caches, offline processing.
 
-If you expose a filter over a network where untrusted parties can observe query results, fixed seeds are a liability: an adversary who knows the seeds can craft inputs that saturate specific bit positions and force false positives on legitimate lookups. For network-exposed filters, random seeds are needed. Contributions welcome.
+If you expose a filter over a network where untrusted parties can observe query results, fixed seeds are a liability: an adversary who knows the seeds can craft inputs that saturate specific bit positions and force false positives on legitimate lookups. Supply random seeds instead:
+
+```ruby
+require "securerandom"
+
+filter = Bloomury::Filter.new(10_000, 0.01,
+  seed1: SecureRandom.random_number(0xFFFFFFFF),
+  seed2: SecureRandom.random_number(0xFFFFFFFF)
+)
+```
 
 ### Not a cryptographic primitive
 
