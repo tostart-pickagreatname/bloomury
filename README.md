@@ -2,76 +2,102 @@
 
 ![Bloomury poster](assets/bloomury_poster.svg)
 
-A probabilistic set membership filter backed by a native C extension. Uses double-hashing with MurmurHash3 (32-bit) and two fixed seeds to generate k independent hash positions per item, striking a balance between speed and low false-positive rates.
+Bloomury is a fast, memory-efficient way to answer one question: **have I seen this before?**
 
-The filter is parameterised by capacity and error rate; optimal bit count (m) and hash count (k) are derived at initialisation using the standard formulae. The bit array is heap-allocated and wrapped via Ruby's TypedData API for safe memory management.
+It's a Bloom filter — a data structure that can tell you with certainty when something is *new*, and with very high confidence when something has been *seen before*. It uses a fraction of the memory a full set would require, making it useful for deduplication, caching, and spam filtering at scale.
 
-## Usage
+The trade-off: it can occasionally say "yes, I've seen this" when it hasn't (a false positive). You control how often that happens via the error rate. It will **never** say "no" when it should say "yes".
+
+## Quick start
 
 ```ruby
-filter = Bloomury::Filter.new(capacity, error_rate)
-filter.add("hello")
-filter.include?("hello")  # => true
-filter.include?("world")  # => false (probably)
-filter.add_count          # number of add calls (including duplicates)
-filter.bit_count          # size of the bit array
-filter.hash_count         # number of hash functions (k)
-```
-
-## Installation
-
-```bash
-bundle add bloomury
-```
-
-Or without bundler:
-
-```bash
 gem install bloomury
 ```
 
-## Security considerations
+```ruby
+require "bloomury"
 
-### Hash seeds
+# Create a filter for up to 10,000 items with a 1% false positive rate
+filter = Bloomury::Filter.new(10_000, 0.01)
 
-This implementation uses fixed seeds for MurmurHash3 (`0x9747b28c` and `0x5a4afe17`). This is appropriate for the intended use cases — local in-process set membership testing, privacy pipelines, deduplication — where no adversary has the ability to probe the filter.
+filter.add("user@example.com")
 
-If you expose a bloom filter over a network interface where untrusted parties can observe membership query results, fixed seeds make you vulnerable to a HashDoS attack. An adversary who knows the seeds can craft inputs that hash to the same bit positions, deliberately saturating regions of the filter to produce false positives on legitimate lookups.
-
-For network-exposed filters, initialize with random seeds and store them alongside the serialized filter state. Contributions welcome.
-
-### Not a cryptographic primitive
-
-MurmurHash3 is a non-cryptographic hash function optimized for speed and distribution quality. It is not suitable for password hashing, message authentication, or any use case requiring preimage resistance. 
-
-## Development
-
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt.
-
-```bash
-rake          # clobber, compile, test, rubocop
-rake compile  # build C extension
-rake test     # run tests only
+filter.include?("user@example.com")  # => true  (definitely seen)
+filter.include?("other@example.com") # => false  (definitely not seen)
 ```
 
-To estimate how much memory a filter will consume before allocating one:
+That's it. Pick a capacity roughly equal to the number of items you expect to add, choose an error rate, and go.
+
+## Choosing your parameters
+
+**Capacity** is the number of items you plan to add. Going significantly over capacity increases the false positive rate beyond what you asked for.
+
+**Error rate** is the probability of a false positive once the filter is full. `0.01` means roughly 1 in 100 membership checks on unseen items will incorrectly return `true`. Lower is more accurate but uses more memory.
+
+Not sure how much memory you'll use? Check before allocating:
 
 ```bash
 rake 'memory_estimate[capacity,error_rate]'
 ```
 
 ```
-$ rake 'memory_estimate[1000000,0.01]'
-capacity:   1000000 items
+$ rake 'memory_estimate[10000,0.01]'
+capacity:   10000 items
 error rate: 0.01
-bit count:  9585059 (7 hash functions)
-memory:     1198133 bytes (1170.05 KB)
+bit count:  95851 (7 hash functions)
+memory:     11982 bytes (11.7 KB)
+```
+
+## Full API
+
+```ruby
+filter = Bloomury::Filter.new(capacity, error_rate)
+
+filter.add("item")        # add an item
+filter.include?("item")   # true/false membership check
+filter.add_count          # number of add calls made (including duplicates)
+filter.bit_count          # size of the underlying bit array
+filter.hash_count         # number of hash functions in use
+```
+
+## When to use a Bloom filter
+
+Good fits:
+- Deduplication — skip processing URLs, emails, or IDs you've already handled
+- Cache guard — avoid expensive lookups for items you know aren't cached
+- Spam/abuse — fast pre-check before a heavier database query
+
+Not a good fit:
+- You need to remove items (Bloom filters are add-only)
+- You need to count occurrences
+- False positives are completely unacceptable
+
+## Security considerations
+
+### Fixed hash seeds
+
+This implementation uses fixed seeds for MurmurHash3 (`0x9747b28c` and `0x5a4afe17`). This is fine for local, in-process use — deduplication pipelines, caches, offline processing.
+
+If you expose a filter over a network where untrusted parties can observe query results, fixed seeds are a liability: an adversary who knows the seeds can craft inputs that saturate specific bit positions and force false positives on legitimate lookups. For network-exposed filters, random seeds are needed. Contributions welcome.
+
+### Not a cryptographic primitive
+
+MurmurHash3 is optimised for speed and distribution, not security. Don't use it for password hashing or message authentication.
+
+## Development
+
+```bash
+bin/setup        # install dependencies
+rake             # compile, test, lint
+rake compile     # build C extension only
+rake test        # Ruby tests only
+rake test_c      # C unit tests only
 ```
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/stscott/bloomury. Contributors are expected to adhere to the [code of conduct](https://github.com/stscott/bloomury/blob/master/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome at https://github.com/stscott/bloomury. Please follow the [code of conduct](https://github.com/stscott/bloomury/blob/master/CODE_OF_CONDUCT.md).
 
 ## License
 
-Available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+[MIT License](https://opensource.org/licenses/MIT).
