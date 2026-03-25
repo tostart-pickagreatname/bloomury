@@ -2,10 +2,8 @@
 #define BLOOMURY_H 1
 
 #include "ruby.h"
-#include <math.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <string.h>
 
 typedef struct {
   uint8_t *bits;
@@ -18,7 +16,5 @@ void bloom_filter_init(BloomFilter *f, uint64_t bit_count, uint32_t hash_count);
 void bloom_filter_free(BloomFilter *f);
 void bloom_filter_add(BloomFilter *f, const uint8_t *data, size_t len);
 int bloom_filter_check(BloomFilter *f, const uint8_t *data, size_t len);
-
-uint32_t murmur3_32(const uint8_t *data, size_t len, uint32_t seed);
 
 #endif /* BLOOMURY_H */
