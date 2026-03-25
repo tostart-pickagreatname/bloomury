@@ -1,5 +1,3 @@
-# Bloomury
-
 ![Bloomury poster](assets/bloomury_poster.svg)
 
 Bloomury is a fast, memory-efficient way to answer one question: **have I seen this before?**
