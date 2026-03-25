@@ -13,7 +13,7 @@ filter = Bloomury::Filter.new(capacity, error_rate)
 filter.add("hello")
 filter.include?("hello")  # => true
 filter.include?("world")  # => false (probably)
-filter.count              # number of items added
+filter.add_count          # number of add calls (including duplicates)
 filter.bit_count          # size of the bit array
 filter.hash_count         # number of hash functions (k)
 ```

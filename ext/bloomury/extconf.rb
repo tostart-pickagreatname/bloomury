@@ -5,6 +5,6 @@ require "mkmf"
 # with other gems. To explicitly export symbols you can use RUBY_FUNC_EXPORTED
 # selectively, or entirely remove this flag.
 append_cflags("-fvisibility=hidden")
-append_cflags("-02")
+append_cflags("-O2")
 
 create_makefile("bloomury/bloomury")

@@ -50,13 +50,13 @@ class TestBloomury < Minitest::Test
     refute f.include?("hello")
   end
 
-  test "count increments on add" do
+  test "add_count increments on each add including duplicates" do
     f = Bloomury::Filter.new(1000, 0.01)
-    assert_equal 0, f.count
+    assert_equal 0, f.add_count
     f.add("a")
-    assert_equal 1, f.count
-    f.add("b")
-    assert_equal 2, f.count
+    assert_equal 1, f.add_count
+    f.add("a")
+    assert_equal 2, f.add_count
   end
 
   test "bit_count is positive" do

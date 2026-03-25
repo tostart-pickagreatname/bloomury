@@ -1,4 +1,5 @@
 #include "bloomury.h"
+#include <limits.h>
 #include <math.h>
 
 VALUE rb_mBloomury;
@@ -46,6 +47,9 @@ static VALUE bloom_initialize(VALUE self, VALUE capacity, VALUE error_rate) {
              "filter parameters would require an infeasible allocation; "
              "run `rake memory_estimate[capacity,error_rate]` to check requirements first");
 
+  if (k < 1)
+    rb_raise(rb_eArgError, "computed hash count is zero; error_rate is too loose");
+
   bloom_filter_init(f, (uint64_t)m, (uint32_t)k);
   return self;
 }
@@ -69,7 +73,7 @@ static VALUE bloom_check(VALUE self, VALUE item) {
   return found ? Qtrue : Qfalse;
 }
 
-static VALUE bloom_item_count(VALUE self) {
+static VALUE bloom_add_count(VALUE self) {
   BloomFilter *f;
   TypedData_Get_Struct(self, BloomFilter, &bloom_type, f);
   return ULL2NUM(f->item_count);
@@ -95,7 +99,7 @@ RUBY_FUNC_EXPORTED void Init_bloomury(void) {
   rb_define_method(rb_cBloomFilter, "initialize", bloom_initialize, 2);
   rb_define_method(rb_cBloomFilter, "add", bloom_add, 1);
   rb_define_method(rb_cBloomFilter, "include?", bloom_check, 1);
-  rb_define_method(rb_cBloomFilter, "count", bloom_item_count, 0);
+  rb_define_method(rb_cBloomFilter, "add_count", bloom_add_count, 0);
   rb_define_method(rb_cBloomFilter, "bit_count", bloom_bit_count, 0);
   rb_define_method(rb_cBloomFilter, "hash_count", bloom_hash_count, 0);
 }
