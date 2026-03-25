@@ -37,4 +37,16 @@ task :memory_estimate, [:capacity, :error_rate] do |_t, args|
   puts "memory:     #{bytes} bytes (#{(bytes / 1024.0).round(2)} KB)"
 end
 
-task default: %i[clobber compile test rubocop]
+desc "Run C unit tests"
+task test_c: :compile do
+  cc      = RbConfig::CONFIG["CC"]
+  cflags  = "-I#{File.expand_path("ext/bloomury")}"
+  src     = "test/c/test_murmurhash3.c ext/bloomury/murmurhash3.c"
+  out     = "tmp/test_murmurhash3"
+
+  mkdir_p "tmp"
+  sh "#{cc} #{cflags} #{src} -o #{out}"
+  sh out
+end
+
+task default: %i[clobber compile test test_c rubocop]
