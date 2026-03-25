@@ -109,6 +109,28 @@ rake test        # Ruby tests only
 rake test_c      # C unit tests only
 ```
 
+## Prior art
+
+[bloomfilter-rb](https://github.com/igrigorik/bloomfilter-rb) by Ilya Grigorik
+is the most widely used Ruby bloom filter gem and was the primary inspiration
+for this project. It implements a counting bloom filter with both native C and
+Redis backends.
+
+Bloomury differs in a few deliberate ways:
+
+- **MurmurHash3** instead of CRC32 for better bit distribution across
+  real-world data patterns
+- **Capacity and error rate** as primary constructor arguments — the filter
+  derives bit count and hash function count mathematically rather than
+  requiring callers to calculate these themselves
+- **Non-counting filter** — no deletion support, which preserves the
+  no-false-negatives guarantee that counting filters can violate on bucket
+  overflow
+- **3-5x faster** in benchmarks for add and lookup operations
+
+If you need deletion support or a Redis-backed shared filter,
+`bloomfilter-rb` may be a better fit.
+
 ## Contributing
 
 Bug reports and pull requests are welcome at https://github.com/tostart-pickagreatname/bloomury. Please follow the [code of conduct](https://github.com/tostart-pickagreatname/bloomury/blob/master/CODE_OF_CONDUCT.md).
