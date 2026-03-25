@@ -4,10 +4,6 @@
 VALUE rb_mBloomury;
 VALUE rb_cBloomFilter;
 
-/* ============================================================
-   Ruby API
-   ============================================================ */
-
 static void bloom_free(void *ptr) {
   BloomFilter *f = (BloomFilter *)ptr;
   bloom_filter_free(f);

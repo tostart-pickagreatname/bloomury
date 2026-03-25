@@ -1,10 +1,6 @@
 #include "bloomury.h"
 #include "murmurhash3.h"
 
-/* ============================================================
-   Bitfield operations
-   ============================================================ */
-
 static inline void bit_set(uint8_t *bits, uint64_t pos) {
   bits[pos / 8] |= (1 << (pos % 8));
 }
@@ -12,10 +8,6 @@ static inline void bit_set(uint8_t *bits, uint64_t pos) {
 static inline int bit_get(const uint8_t *bits, uint64_t pos) {
   return (bits[pos / 8] >> (pos % 8)) & 1;
 }
-
-/* ============================================================
-   BloomFilter struct operations
-   ============================================================ */
 
 void bloom_filter_init(BloomFilter *f, uint64_t bit_count,
                        uint32_t hash_count) {
