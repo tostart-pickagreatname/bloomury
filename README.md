@@ -52,6 +52,20 @@ rake compile  # build C extension
 rake test     # run tests only
 ```
 
+To estimate how much memory a filter will consume before allocating one:
+
+```bash
+rake 'memory_estimate[capacity,error_rate]'
+```
+
+```
+$ rake 'memory_estimate[1000000,0.01]'
+capacity:   1000000 items
+error rate: 0.01
+bit count:  9585059 (7 hash functions)
+memory:     1198133 bytes (1170.05 KB)
+```
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/stscott/bloomury. Contributors are expected to adhere to the [code of conduct](https://github.com/stscott/bloomury/blob/master/CODE_OF_CONDUCT.md).
