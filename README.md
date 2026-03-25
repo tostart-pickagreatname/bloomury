@@ -113,7 +113,7 @@ rake test_c      # C unit tests only
 
 ## Contributing
 
-Bug reports and pull requests are welcome at https://github.com/stscott/bloomury. Please follow the [code of conduct](https://github.com/stscott/bloomury/blob/master/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome at https://github.com/tostart-pickagreatname/bloomury. Please follow the [code of conduct](https://github.com/tostart-pickagreatname/bloomury/blob/master/CODE_OF_CONDUCT.md).
 
 ## License
 
