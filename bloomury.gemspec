@@ -13,7 +13,6 @@ Gem::Specification.new do |spec|
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.2.0"
   spec.metadata["homepage_uri"] = spec.homepage
-  spec.metadata["source_code_uri"] = "https://github.com/tostart-pickagreatname/bloomury"
   spec.metadata["changelog_uri"] = "https://github.com/tostart-pickagreatname/bloomury/blob/main/CHANGELOG.md"
 
   # Specify which files should be added to the gem when it is released.
