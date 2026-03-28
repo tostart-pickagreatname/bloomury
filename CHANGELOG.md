@@ -1,5 +1,16 @@
 ## [Unreleased]
 
+## [0.1.1] - 2026-03-27
+
+### Changed
+- Scoped `minitest` to the `:test` group and `rubocop`/`irb` to the `:development` group in the Gemfile
+- Rakefile now gracefully handles missing test/development gems via `rescue LoadError`
+- Removed unused RBS type stub (`sig/bloomury.rbs`)
+- Removed unused `bin/console` boilerplate
+- Removed boilerplate comment from `lib/bloomury.rb`
+- Removed `set -vx` from `bin/setup`
+- Added automated gem release workflow via GitHub Actions with trusted publishing
+
 ## [0.1.0] - 2026-03-25
 
 ### Added
@@ -9,3 +20,7 @@
 - `add(item)`, `include?(item)`, `add_count`, `bit_count`, `hash_count`, `seed1`, `seed2`
 - Standalone C unit tests for MurmurHash3 (`rake test_c`)
 - `rake 'memory_estimate[capacity,error_rate]'` task to estimate memory usage before allocating
+
+[Unreleased]: https://github.com/tostart-pickagreatname/bloomury/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/tostart-pickagreatname/bloomury/compare/v0.1.0...v0.1.1
+[0.1.0]: https://github.com/tostart-pickagreatname/bloomury/releases/tag/v0.1.0
