@@ -20,3 +20,7 @@
 - `add(item)`, `include?(item)`, `add_count`, `bit_count`, `hash_count`, `seed1`, `seed2`
 - Standalone C unit tests for MurmurHash3 (`rake test_c`)
 - `rake 'memory_estimate[capacity,error_rate]'` task to estimate memory usage before allocating
+
+[Unreleased]: https://github.com/tostart-pickagreatname/bloomury/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/tostart-pickagreatname/bloomury/compare/v0.1.0...v0.1.1
+[0.1.0]: https://github.com/tostart-pickagreatname/bloomury/releases/tag/v0.1.0
